@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Copy requirements first (Docker cache layer)
 COPY requirements-cloud.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --no-build-isolation -r requirements.txt
 
 # Copy application code
 COPY . .
