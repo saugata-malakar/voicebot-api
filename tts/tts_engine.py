@@ -132,14 +132,27 @@ def synthesize(
             fmt = "mp3"
             used = "gtts"
         except Exception as exc:
-            logger.warning("gTTS failed ({}); retrying with pyttsx3.", exc)
+            if _PYTTSX3_AVAILABLE:
+                logger.warning("gTTS failed ({}); retrying with pyttsx3.", exc)
+                audio = _synthesize_pyttsx3(text, rate, volume)
+                fmt = "wav"
+                used = "pyttsx3"
+            else:
+                raise RuntimeError(f"gTTS failed: {exc}. pyttsx3 not available on this platform.")
+    elif effective_engine == "pyttsx3":
+        if not _PYTTSX3_AVAILABLE:
+            logger.warning("pyttsx3 not available, falling back to gTTS.")
+            audio = _synthesize_gtts(text, language, slow)
+            fmt = "mp3"
+            used = "gtts"
+        else:
             audio = _synthesize_pyttsx3(text, rate, volume)
             fmt = "wav"
             used = "pyttsx3"
     else:
-        audio = _synthesize_pyttsx3(text, rate, volume)
-        fmt = "wav"
-        used = "pyttsx3"
+        audio = _synthesize_gtts(text, language, slow)
+        fmt = "mp3"
+        used = "gtts"
 
     synthesis_time = round(time.perf_counter() - t0, 3)
     logger.info(
