@@ -7,10 +7,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Install setuptools with pkg_resources (needed by openai-whisper build)
+# Install setuptools with pkg_resources (removed in setuptools>=75)
 RUN pip install --no-cache-dir --upgrade pip "setuptools<75.0" wheel
 
-# Copy requirements first (Docker cache layer)
+# Install openai-whisper first WITHOUT build isolation so it uses our setuptools
+RUN pip install --no-cache-dir --no-build-isolation openai-whisper==20231117
+
+# Copy and install remaining requirements
 COPY requirements-cloud.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
