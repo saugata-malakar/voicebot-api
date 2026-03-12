@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: voicebot-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ASR_MODEL
+        value: tiny
+      - key: TTS_ENGINE
+        value: gtts
+      - key: PYTHON_VERSION
+        value: "3.11"

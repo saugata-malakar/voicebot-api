@@ -1,0 +1,28 @@
+# Cloud deployment requirements (no pyttsx3 - headless server)
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+aiofiles==23.2.1
+
+# ASR - Whisper
+openai-whisper==20231117
+
+# NLP / Intent Classification
+transformers==4.41.2
+torch==2.3.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+scikit-learn==1.5.0
+numpy==1.26.4
+
+# Text-to-Speech (gTTS only for cloud - pyttsx3 needs desktop)
+gTTS==2.5.1
+
+# Audio utilities
+pydub==0.25.1
+soundfile==0.12.1
+librosa==0.10.2
+jiwer==3.0.4
+
+# Utilities
+python-dotenv==1.0.1
+loguru==0.7.2
