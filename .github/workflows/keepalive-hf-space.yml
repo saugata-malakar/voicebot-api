@@ -1,25 +1,36 @@
-name: Keep HF Space Awake
+name: Keep HF Space Warm
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
+concurrency:
+  group: hf-space-keepalive
+  cancel-in-progress: true
+
 jobs:
-  ping:
+  ping-space:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Ping health endpoint
+      - name: Warm up and verify health
         run: |
-          set -e
-          for i in 1 2 3; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" "https://saugata12-voicebot-api.hf.space/health")
+          set -euo pipefail
+          BASE_URL="https://saugata12-voicebot-api.hf.space"
+
+          # A cold app may answer root sooner than /health.
+          curl -sS -L --max-time 45 "$BASE_URL/" > /dev/null || true
+
+          for i in 1 2 3 4; do
+            code=$(curl -sS -L --max-time 45 -o /tmp/health.json -w "%{http_code}" "$BASE_URL/health" || echo 000)
             echo "Attempt $i -> HTTP $code"
             if [ "$code" = "200" ]; then
+              cat /tmp/health.json || true
               exit 0
             fi
-            sleep 10
+            sleep 20
           done
-          echo "Health endpoint did not return 200"
+
+          echo "Health endpoint did not return 200 after retries"
           exit 1
